@@ -32,7 +32,8 @@
     </div>
 
     <!-- script -->
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script>
         $(document).ready(function() {
             /*
@@ -40,6 +41,16 @@
             $(".well").addClass("animated shake");
             $("#target3").addClass("animated fadeOut");
             */
+           /*
+            $("button").addClass("animated");
+            $(".btn").addClass("shake");
+            $("#target1").addClass("btn-primary");
+           */
+            $("button").addClass("animated bounce");
+            $(".well").addClass("animated shake");
+            $("#target3").addClass("animated fadeOut");
+            $("button").removeClass("btn-default");
+            $("#target1").css("color", "red");
         });
     </script>
 </body>
@@ -108,4 +119,45 @@ $("#target6").addClass("animated fadeOut");
 These animations were cool at first, but now they're getting kind of distracting.
 Delete all three of these jQuery functions from your document ready function, but leave your
 document ready function itself intact.
+
+////Target the Same Element with Multiple jQuery Selectors
+Now you know three ways of targeting elements: by type: $("button"), by class: $(".btn") and
+by id $("#target1").
+Although it is possible to add multiple classes in a single .addClass() call, let's add them
+to the same element in three separate ways.
+Using .addClass(), add only one class at a time to the same element, three different ways:
+Add the animated class to all elements with type button.
+Add the shake class to all the buttons with class .btn.
+Add the btn-primary class to the button with id #target1.
+Note: You should only be targeting one element and adding only one class at a time. Altogether,
+your three individual selectors will end up adding the three classes shake, animated and btn-primary
+to #target1.
+
+////Remove Classes from an Element with jQuery
+In the same way you can add classes to an element with jQuery's addClass() function, you can remove
+them with jQuery's removeClass() function.
+Here's how you would do this for a specific button:
+$("#target2").removeClass("btn-default");
+Let's remove the btn-default class from all of our button elements.
+
+////Change the CSS of an Element Using jQuery
+We can also change the CSS of an HTML element directly with jQuery.
+jQuery has a function called .css() that allows you to change the CSS of an element.
+Here's how we would change its color to blue:
+$("#target1").css("color", "blue");
+This is slightly different from a normal CSS declaration, because the CSS property and its value 
+are in quotes, and separated with a comma instead of a colon.
+Delete your jQuery selectors, leaving an empty document ready function.
+Select target1 and change its color to red.
+
+////Disable an Element Using jQuery
+You can also change the non-CSS properties of HTML elements with jQuery. For example, you can disable
+buttons.
+When you disable a button, it will become grayed-out and can no longer be clicked.
+jQuery has a function called .prop() that allows you to adjust the properties of elements.
+Here's how you would disable all buttons:
+$("button").prop("disable", true);
+Disable only the target1 button.
+
+
 -->
