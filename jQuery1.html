@@ -51,6 +51,8 @@
             $("#target3").addClass("animated fadeOut");
             $("button").removeClass("btn-default");
             $("#target1").css("color", "red");
+            $("button").prop("disable", true);
+            $("#target1").prop("disabled", true);
         });
     </script>
 </body>
@@ -158,6 +160,4 @@ jQuery has a function called .prop() that allows you to adjust the properties of
 Here's how you would disable all buttons:
 $("button").prop("disable", true);
 Disable only the target1 button.
-
-
 -->
