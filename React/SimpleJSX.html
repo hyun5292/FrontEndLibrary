@@ -25,3 +25,22 @@ of the actual DOM.
 The current code uses JSX to assign a div element to the constant JSX. Replace the div with an h1 element and
 add the text Hello JSX! inside it.
 -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <title>Create a Simple JSX Element</title>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const JSX = <h1>Hello JSX!</h1>;
+
+        ReactDOM.render(JSX, document.getElementById('root'));
+    </script>
+</body>
+</html>
