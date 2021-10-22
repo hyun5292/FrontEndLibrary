@@ -31,3 +31,31 @@ strictly required. Also notice this challenges uses a div tag to wrap all the ch
 a single parent element. If you remove the div, the JSX will no longer transplie. Keep this in mind,
 since it will also apply when you return JSX elements in React components.
 -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <title>Create a Complex JSX Element</title>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const JSX = 
+        <div>
+            <h1>I am h1 tag.</h1>
+            <p>I am p tag.</p>
+            <ul>
+                <li>I am one.</li>
+                <li>I am two.</li>
+                <li>I am three.</li>
+            </ul>    
+        </div>;
+
+        ReactDOM.render(JSX, document.getElementById('root'));
+    </script>
+</body>
+</html>
