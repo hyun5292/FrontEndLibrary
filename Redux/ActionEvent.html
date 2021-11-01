@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/5.0.0-alpha.0/redux.min.js"></script>
+    <title>Define an Action Creator</title>
+</head>
+<body>
+    <div id="test"></div>
+    
+    <script type="text/babel">
+        const store = Redux.createStore(
+            (state = {login: false}) => state
+        );
+
+        const loginAction = () => {
+            return {
+                type: 'LOGIN'
+            }
+        };
+
+        store.dispatch();
+        store.dispatch(loginAction());
+    </script>
+</body>
+</html>
+<!--
+////Dispatch an Action Event
+dispatch method is what you use to dispatch actions to the Redux store. Calling store.dispatch() and
+passing the value returned from an action creator sends an action back to the store.
+
+Recall that action creators return an object with a type property that specifies the action that has 
+occurred. Then the method dispatches an action object to the Redux store. Based on the previous challenge's
+example, the following lines are equivalent, and both dispatch the action of type LOGIN:
+
+store.dispatch(actionCreator());
+store.dispatch({ type: 'LOGIN' });
+-------------------------------------------------------------------------------------------------------
+The Redux store in the code editor has an initialized state that's an object containing a login property
+currently set to false. There's also an action creator called loginAction() which returns an action of
+type LOGIN. Dispatch the LOGIN action to the Redux store by calling the dispatch method, and pass in the
+action created by loginAction().
+-->
