@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/5.0.0-alpha.0/redux.min.js"></script>
+    <title>Use const for Action Types</title>
+</head>
+<body>
+    <script type="text/babel">
+        const LOGIN = 'LOGIN';
+        const LOGOUT = 'LOGOUT';
+        const defaultState = {
+            authenticated: false
+        };
+
+        const authReducer = (state = defaultState, action) => {
+            switch(action.type) {
+                case LOGIN:
+                    return {
+                        authenticated: true
+                    }
+                case LOGOUT:
+                    return {
+                        authenticated: false
+                    }
+                default:
+                    return state;
+            }
+        };
+
+        const store = Redux.createStore(authReducer);
+
+        const loginUser = () => {
+            return {
+                type: LOGIN
+            }
+        };
+
+        const logoutUser = () => {
+            return {
+                type: LOGOUT
+            }
+        };
+    </script>
+</body>
+</html>
+<!--
+////Use const for Action Types
+A common practice when working with Redux is to assign action types as read-only constants, then
+reference these constants wherever they are used. You can refactor the code you're working with
+to write the action types as const declarations.
+------------------------------------------------------------------------------------------------
+Declare LOGIN and LOGOUT as const values and assign them to the strings 'LOGIN' and 'LOGOUT',
+respectively. Then, edit the authReducer() and the action creators to reference these constants
+instead of string values.
+
+Note: It's generally a convention to write constants in all uppercase, and this is standard practice
+in Redux as well.
+-->
