@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/5.0.0-alpha.0/redux.min.js"></script>
+    <title>Get State from the Redux Store</title>
+</head>
+<body>
+    <div id="test"></div>
+    
+    <script type="text/babel">
+        const store = Redux.createState(
+            (state = 5) => state
+        );
+
+        const currentState = store.getState();
+    </script>
+</body>
+</html>
+<!--
+////Get State from the Redux Store
+The Redux store object provides several methods that allow you to interact with it. For example,
+you can retrieve the current state held in the Redux store object with the getState() method.
+-------------------------------------------------------------------------------------------------
+The code from the pervious challenge is re-written more concisely in the code editor. Use store.getState()
+to retrieve the state from the store, and assign this to a new variable currentState.
+-->
