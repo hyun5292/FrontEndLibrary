@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/5.0.0-alpha.0/redux.min.js"></script>
+    <title>Define an Action Creator</title>
+</head>
+<body>
+    <div id="test"></div>
+    
+    <script type="text/babel">
+        const action = { 
+            type:'LOGIN' 
+        }
+
+        function actionCreator() {
+            return action;
+        }
+    </script>
+</body>
+</html>
+<!--
+////Define an Action Creator
+After creating an action, the next step is sending the action to the Redux store so it can
+update its state. In Redux, you define action creators to accomplish this. An action creator
+is simply a JavaScript function that returns an action. In other words, action creators create
+objects that represent action events.
+----------------------------------------------------------------------------------------------
+Define a function named actionCreater() that returns the action object when called.
+-->
