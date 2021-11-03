@@ -86,6 +86,8 @@
             }
         };
 
+        ReactDOM.render(<Presentational />, document.getElementById('test'));
+
         //React-Redux:
         const mapStateToProps = (state) => {
             return { messages: state };
@@ -102,6 +104,7 @@
         const Provider = ReactRedux.Provider;
         const connect = ReactRedux.connect;
 
+        const cntContainer = connect(mapStateToProps, mapDispatchToProps)(Presentational);
 
         class AppWrapper extends React.Component {
             constructor(props) {
@@ -109,7 +112,11 @@
             }
 
             render() {
-                return (null);
+                return (
+                    <Provider store={store}>
+                        <cntContainer />
+                    </Provider>
+                );
             }
         };
     </script>
