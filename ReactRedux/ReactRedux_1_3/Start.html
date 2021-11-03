@@ -14,6 +14,15 @@
 
     <script type="text/babel">
         const ADD = 'ADD';
+
+        const addMessage = (message) => {
+
+        };
+
+        const messageReducer = () => {
+            
+        };
+
         class DisplayMessages extends React.Component {
             constructor(props) {
                 super(props);
@@ -56,24 +65,7 @@
             };
         };
 
-        const addMessage = (message) => {
-            return {
-                type: ADD,
-                message
-            }
-        };
-
-        const messageReducer = (state = [], action) => {
-            switch(action.type) {
-                case ADD: 
-                    return [...state, action.message];
-                default: 
-                    return state;
-            };
-        };
-
         ReactDOM.render(<DisplayMessages />, document.getElementById('test'));
-        const store = Redux.createStore(messageReducer);
     </script>
 </body>
 </html>
