@@ -35,17 +35,15 @@
 
         const store = Redux.createStore(messageReducer);
 
-        // React:
+        //React:
         const Provider = ReactRedux.Provider;
         const connect = ReactRedux.connect;
 
-        // Change code below this line
         class Presentational extends React.Component {
             constructor(props) {
                 super(props);
                 this.state = {
-                    input: '',
-                    messages: []
+                    input: ''
                 }
                 this.handleChange = this.handleChange.bind(this);
                 this.submitMessage = this.submitMessage.bind(this);
@@ -56,10 +54,10 @@
                 });
             }
             submitMessage() {
-                this.setState((state) => ({
-                    input: '',
-                    messages: state.messages.concat(state.input)
-                }));
+                this.props.submitNewMessage(this.state.input);
+                this.setState({
+                    input: ''
+                });
             }
             render() {
                 return (
@@ -71,11 +69,11 @@
                         <br/>
                         <button onClick={this.submitMessage}>Submit</button>
                         <ul>
-                            {this.state.messages.map( (message, idx) => {
+                            {this.props.messages != undefined && this.props.messages.map( (message, idx) => {
                                 return (
                                     <li key={idx}>{message}</li>
-                                )
-                            })}
+                                )})
+                            }
                         </ul>
                     </div>
                 );
@@ -92,7 +90,7 @@
         const mapDispatchToProps = (dispatch) => {
             return {
                 submitNewMessage: (message) => {
-                    dispatch(addMessage(message))
+                dispatch(addMessage(message))
                 }
             }
         };
@@ -102,9 +100,9 @@
         class AppWrapper extends React.Component {
             render() {
                 return (
-                    <Provider store={store}>
-                        <Container/>
-                    </Provider>
+                <Provider store={store}>
+                    <Container/>
+                </Provider>
                 );
             }
         };
