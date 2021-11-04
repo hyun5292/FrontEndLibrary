@@ -3,11 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/5.0.0-alpha.0/redux.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux-thunk/2.2.0/redux-thunk.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-redux/8.0.0-alpha.1/react-redux.min.js"></script>
     <title>Moving Forward From Here</title>
 </head>
 <body>
     <div id="root"></div>
 
-    <script type="text/javascript" src="./Finally.js"></script>
+    <!--<script type="module" src="./Finally.js"></script>-->
+    <script type="text/babel">
+    /*
+        const store = createStore(rootReducer, applyMiddleware(thunk));
+        ReactDOM.render(
+            <Provider store={store}>
+                <App/>
+            </Provider>,
+            document.getElementById('root')
+        );
+    */
+        console.log('Now I know React and Redux!');
+    </script>
 </body>
 </html>
