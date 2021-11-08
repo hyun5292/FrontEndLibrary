@@ -6,3 +6,74 @@ $backgroundBase: #619e9e;
 $shadow: 1px 1px 10px 2px darken($backgroundBase, 20%);
 $default-border: 1px solid darken($backgroundBase, 35%);
 
+* {
+    box-sizing: border-box;
+}
+
+body { margin: 10px 0; text-align: left; color: #212529; line-height: 1.5; font-size: 1rem; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; background-color: lighten($backgroundBase, 12%); }
+
+.colorScheme { border: $default-border; border-top: none; background-color: lighten($backgroundBase, 30%); }
+
+//창 상단바
+.toolbar { display: flex; padding: 0.3rem; align-items: center; box-shadow: $shadow; color: black; font-size: 1rem; font-family: Russo One; background-color: lighten($darkAccent, 25%); 
+    i { margin-left: 5px; width: 25px; }
+    .fa-arrows-alt, 
+    .fa-compress { margin-left: auto; }
+}
+
+//확대 축소 아이콘 색상 변경
+.fa-retweet,
+.fa-compress,
+.fa-arrows-alt {
+    &:hover { color: lighten($lightAccent, 10%); cursor: pointer; }
+}
+
+.fa-free-code-camp { margin-right: 3px; }
+
+.editorWrap { margin: 1.125rem auto; max-width: 600px;
+    .toolbar { width: 99%; }
+    textarea { @extend .colorScheme; margin-bottom: -5px; padding-left: 5px; padding-top: 5px; width: 99%; min-height: 200px; resize: vertical; outline: none; font-size: 0.875rem; }
+}
+
+.converter { margin: auto; width: 100px; text-align: center; font-size: 35px; }
+
+//overflow-wrap은 글씨를 넘기느냐 아니면 자르느냐 결정하는 속성
+.previewWrap { @extend .colorScheme; margin: 1.25rem auto; max-width: 800px; min-height: 200px; overflow-wrap: break-word; }
+
+//창이 커졌을 때
+.maximized { margin: auto; width: 96%; min-height: 100vh;
+    textarea { min-height: 95vh; resize: none; }
+}
+
+//창 다시 닫았을 때
+.hide { display: none; }
+
+//마크다운 스타일이래 마크다운도 공부해야하나 학교에서 했었나... 기억이 가물가물허네...
+#preview { padding: 0 1rem;
+    blockquote { margin-left: 25px; padding-left: 5px; border-left: 3px solid #224b4b; color: #224b4b; }
+    > p > code { padding: 3px; }
+    code { font-size: 0.875rem; font-weight: bold; background: white; }
+    pre { display: block; padding: 5px; overflow: auto; line-height: 1.2; background: white; }
+    h1 { border-bottom: 2px solid $darkAccent; }
+    h2 { border-bottom: 1px solid $darkAccent; }
+    table { border-collapse: collapse; }
+    td, th { padding-left: 5px; padding-right: 5px; border: 2px solid $darkAccent; }
+    img { display: block; margin: 2rem auto; max-width: 90%; }
+}
+
+//화면 크기별 속성 변경
+@media screen and (max-width: 420px) {
+    body { font-size: 0.875rem; }
+}
+
+@media screen and (max-width: 650px) {
+    body { margin: 5px 0; }
+    .editorWrap { margin: 0 auto; width: 80vw; }
+    .previewWrap { width: 90vw; }
+    .maximized { margin: auto; width: 95%; }
+}
+
+@media screen and (max-width: 850px) {
+    .previewWrap { max-width: 630px; }
+    .editorWrap { max-width: 550px; }
+}
