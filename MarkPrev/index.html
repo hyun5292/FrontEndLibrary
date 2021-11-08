@@ -9,9 +9,10 @@
     <title>Simple React Markdown Previewer</title>
 </head>
 <body>
-    <div class="app"></div>
+    <div id="app"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/3.0.4/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js"></script>
     <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
@@ -22,7 +23,7 @@
 
         marked.setOptions({
             breaks: true,
-            heighlight: function (code) {
+            highlight: function (code) {
                 return Prism.highlight(code, Prism.languages.javascript, 'javascript');
             }
         });
