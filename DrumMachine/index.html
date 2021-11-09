@@ -133,6 +133,7 @@
             }
         ];
 
+        //활성화 됐을 때
         const activeStyle = {
             marginTop: 13,
             height: 77,
@@ -140,6 +141,7 @@
             backgroundColor: 'orange'
         };
 
+        //비활성화 됐을 때
         const inactiveStyle = {
             marginTop: 10,
             boxShadow: '3px 3px 5px black',
@@ -156,9 +158,11 @@
                 this.handleKeyPress = this.handleKeyPress.bind(this);
                 this.activatePad = this.activatePad.bind(this);
             }
+            //컴포넌트가 마운트 된 직후
             componentDidMount() {
                 document.addEventListener('keydown', this.handleKeyPress);
             }
+            //컴포넌트가 마운트 해제되어 제거되기 직전 호출
             componentWillUnmount() {
                 document.removeEventListener('keydown', this.handleKeyPress);
             }
@@ -168,21 +172,21 @@
                 }
             }
             activatePad() {
-                if (this.props.power) {
+                if (this.props.power) {  //power가 켜져있으면
                     if (this.state.padStyle.backgroundColor === 'orange') {
                         this.setState({
                             padStyle: inactiveStyle
                         });
-                    } else {
+                    } else {  //패드가 안눌렸으면
                         this.setState({
                             padStyle: activeStyle
                         });
                     }
-                } else if (this.state.padStyle.marginTop === 13) {
+                } else if (this.state.padStyle.marginTop === 13) {  //activeStyle면
                     this.setState({
                         padStyle: inactiveStyle
                     });
-                } else {
+                } else {  //패드가 완전히 꺼져있는 상태
                     this.setState({
                         padStyle: {
                             marginTop: 13,
@@ -193,15 +197,18 @@
                     });
                 }
             }
+            //뮤직 큐!
             playSound() {
+                //bankOne이나 bankTwo에 keyTrigger
                 const sound = document.getElementById(this.props.keyTrigger);
-                sound.currentTime = 0;
-                sound.play();
-                this.activatePad();
-                setTimeout(() => this.activatePad(), 100);
+                sound.currentTime = 0;  //음악 처음으로 초기화하는건가
+                sound.play();  //이걸로 소리가 난다구...? bankOne bankTwo에 저장되어있는게 소리가 나??
+                this.activatePad();  //눌렸을 때 주황색 띄워주고
+                setTimeout(() => this.activatePad(), 100);  //0.1초 뒤 원상복귀
                 this.props.updateDisplay(this.props.clipId.replace(/-/g, ' '));
             }
             render() {
+                //패드를 반환
                 return (
                     <div
                         className='drum-pad'
@@ -218,15 +225,18 @@
             }
         }
 
+        //패드 반환 전용?
         class PadBank extends React.Component {
             constructor(props) {
                 super(props);
             }
             render() {
                 let padBank;
-                if (this.props.power) {
+                //현재 bank가 뭔지 알아보고 전달하는구낭
+                if (this.props.power) {  //power가 켜져있으면
                     padBank = this.props.currentPadBank.map((drumObj, i, padBankArr) => {
                         return (
+                            //패드 음악 설정하려고 따로 둔건가?
                             <DrumPad
                                 clip={padBankArr[i].url}
                                 clipId={padBankArr[i].id}
@@ -236,11 +246,11 @@
                                 updateDisplay={this.props.updateDisplay} />
                         );
                     });
-                } else {
+                } else {  //power가 꺼져있으면
                     padBank = this.props.currentPadBank.map((drumObj, i, padBankArr) => {
                         return (
                         <DrumPad
-                            clip='#'
+                            clip='#'  //껐다가 켜면 아무것도 없으니께
                             clipId={padBankArr[i].id}
                             keyCode={padBankArr[i].keyCode}
                             keyTrigger={padBankArr[i].keyTrigger}
@@ -249,6 +259,7 @@
                         );
                     });
                 }
+                 //그 외에 혹시나
                 return <div className='pad-bank'>{padBank}</div>;
             }
         }
@@ -269,43 +280,47 @@
                 this.powerControl = this.powerControl.bind(this);
                 this.clearDisplay = this.clearDisplay.bind(this);
             }
+            //power 버튼 누르면
             powerControl() {
                 this.setState({
-                    power: !this.state.power,
+                    power: !this.state.power,  //현 상태는 반대로
                     display: String.fromCharCode(160)
                 });
             }
+            //Bank 버튼 누르면
             selectBank() {
-                if (this.state.power) {
-                    if (this.state.currentPadBankId === 'Heater Kit') {
+                if (this.state.power) {  //Power가 켜저있으면
+                    if (this.state.currentPadBankId === 'Heater Kit') {  //현재 Heater Kit면
                         this.setState({
-                            currentPadBank: bankTwo,
+                            currentPadBank: bankTwo,  //Smooth Piano Kit가 bank2번이구나
                             display: 'Smooth Piano Kit',
                             currentPadBankId: 'Smooth Piano Kit'
                         });
-                    } else {
+                    } else {  //현재 Smooth Piano Kit면
                         this.setState({
-                            currentPadBank: bankOne,
+                            currentPadBank: bankOne,  //Smooth Piano Kit가 bank1번이구나
                             display: 'Heater Kit',
                             currentPadBankId: 'Heater Kit'
                         });
                     }
                 }
             }
+            //현재 선택된 Bank를 화면에 띄워주는 함수? 메서드? 컴포넌트?
             displayClipName(name) {
-                if (this.state.power) {
+                if (this.state.power) {  //Power가 켜저있으면
                     this.setState({
                         display: name
                     });
                 }
             }
+            //볼륨바 설정
             adjustVolume(e) {
-                if (this.state.power) {
+                if (this.state.power) {  //Power가 켜저있으면
                     this.setState({
-                        sliderVal: e.target.value,
+                        sliderVal: e.target.value,  //현재 값
                         display: 'Volume: ' + Math.round(e.target.value * 100)
                     });
-                    setTimeout(() => this.clearDisplay(), 1000);
+                    setTimeout(() => this.clearDisplay(), 1000);  //1초후에 clearDisplay() 실행
                 }
             }
             clearDisplay() {
@@ -314,12 +329,12 @@
                 });
             }
             render() {
-                const powerSlider = this.state.power
-                    ? { float: 'right' }
-                    : { float: 'left' };
-                const bankSlider = this.state.currentPadBank === bankOne
-                    ? { float: 'left' }
-                    : { float: 'right' };
+                const powerSlider = this.state.power //전원이 켜져있으면
+                    ? { float: 'right' }  //버튼 위치 오른쪽
+                    : { float: 'left' };  //버튼 위치 왼쪽
+                const bankSlider = this.state.currentPadBank === bankOne  //Smooth Piano Kit
+                    ? { float: 'left' }  //버튼 위치 왼쪽
+                    : { float: 'right' };  //버튼 위치 오른쪽
                 {
                     const clips = [].slice.call(document.getElementsByClassName('clip'));
                     clips.forEach(sound => {
