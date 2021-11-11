@@ -17,45 +17,77 @@
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
     <script type="text/babel">
-        const projectName = "Javascript-Calculator"
+        const projectName = 'javascript-calculator';
 
-        class Buttons extends React.Component {
-            constructor(props) {
-                super(props);
-            }
-
-            render() {
-                return (
-                    <div></div>
-                );
-            }
+        const isOperator = /[x/+-]/,
+        endsWithnegativeSign = /[x+-/]$/,
+        clearStyle = { background: '#ac3939' },
+        operatorStyle = { background: '#666666' },
+        equalsStyle = { 
+            position: 'absolute',
+            bottom: 5,
+            height: 130,
+            background: '#004466'
         };
 
-        class App extends React.Component {
+        class Calculator extends React.Component {
             constructor(props) {
                 super(props);
                 this.state = {
-                    result: 0
+                    currentVal: '0',
+                    prevval: '0',
+                    formula: '',
+                    currentSign: 'pos',
+                    lastClicked: ''
                 };
+                this.maxDigitWarning = this.maxDigitWarning.bind(this);
+                this.handleOperators = this.handleOperators.bind(this);
+                this.hadleEvaluate = this.hadleEvaluate.bind(this);
+                this.initialize = this.initialize.bind(this);
+                this.handleDecimal = this.handleDecimal.bind(this);
+                this.handleNumbers = this.handleNumbers.bind(this);
             }
 
-            render() {
-                return (
-                    <div class="wrapper">
-                         <div class="calc">
-                            <p class="output">{this.state.result}</p>
-                            <Buttons /> 
-                        </div>   
-                        <div class="footer">
-                            Designed and Coded By
-                            <a href="#a">SuDol</a>
-                        </div>
-                    </div>
-                );
+            //최고점이 있는 계산기였구낭
+            maxDigitWarning() {
+                this.setState({
+                    currentBal: 'Digit Limit Met',
+                    prevVal: this.state.currentVal
+                });
+                setTimeout(() => this.setState({ currentVal: this.state.prevVal }), 1000);
             }
+
+            handleEvaluate() {
+                if(!this.state.currentVal.includes('Limit')) {  //최고점을 안넘었으면
+                    let expression = this.state.formula;  //현재 계산 공식
+                    while(endsWithOperator.test(expression)) {  //공식이 x, +, -, /로 끝나는 동안
+                        expression = expression.slice(0, -1);  //끝에서 1개 발췌?
+                    }
+                    expression = expression
+                        .replace(/x/g, '*')  //계산은 x가 아니라 *로 하니까
+                        .replace(/-/g, '-')
+                        .replace('--', '+0+0+0+0+0+0+');  //이건 또 뭘까
+                    //계산해서 왜 1000000000000을 곱하고 나누는걸까?
+                    let answer = Math.round(1000000000000 * eval(expression)) / 1000000000000;
+                    this.setState({
+                        currentVal: answer.toString(),
+                        formula:
+                            expression
+                                .replace(/\*/g, '⋅')
+                                .replace(/-/g, '-')
+                                .replace('+0+0+0+0+0+0+', '--')
+                                .replace(/(x|\/|\+)-/, '$1-')
+                                .replace(/^-/, '-') + '=' + answer,
+                            prevVal: answer,
+                            evaluated: true
+                    });
+                }
+            }
+
+            
         };
 
-        ReactDOM.render(<App />, document.getElementById("app"));
+        ReactDOM.render(<Calculator />, document.getElementById("app"));
     </script>
 </body>
 </html>
