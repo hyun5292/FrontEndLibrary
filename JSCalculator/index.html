@@ -19,8 +19,10 @@
     <script type="text/babel">
         const projectName = 'javascript-calculator';
 
-        const isOperator = /[x/+-]/,
-        endsWithnegativeSign = /[x+-/]$/,
+        const isOperator = /[x/+‑]/,  //다른 것 없이 x, +, -, /로 되어있는가
+        endsWithOperator = /[x+‑/]$/,  //x, +, -, /로 끝나는가
+        //맨 앞은 [0-9], 그 다음 x, /, +, - 중 하나고 그 다음 1개의 요소가 오고 -로 끝나는가
+        endsWithNegativeSign = /\d[x/+‑]{1}‑$/,  
         clearStyle = { background: '#ac3939' },
         operatorStyle = { background: '#666666' },
         equalsStyle = { 
@@ -48,7 +50,7 @@
                 this.handleNumbers = this.handleNumbers.bind(this);
             }
 
-            //최고점이 있는 계산기였구낭
+            //최댓값이 있는 계산기였구낭
             maxDigitWarning() {
                 this.setState({
                     currentBal: 'Digit Limit Met',
@@ -57,11 +59,13 @@
                 setTimeout(() => this.setState({ currentVal: this.state.prevVal }), 1000);
             }
 
+            //계산하는 메서드인가
             handleEvaluate() {
-                if(!this.state.currentVal.includes('Limit')) {  //최고점을 안넘었으면
+                if(!this.state.currentVal.includes('Limit')) {  //최댓값을 안넘었으면
                     let expression = this.state.formula;  //현재 계산 공식
                     while(endsWithOperator.test(expression)) {  //공식이 x, +, -, /로 끝나는 동안
                         expression = expression.slice(0, -1);  //끝에서 1개 발췌?
+                        console.log("exrpession = " + exrpession);
                     }
                     expression = expression
                         .replace(/x/g, '*')  //계산은 x가 아니라 *로 하니까
@@ -85,19 +89,122 @@
             }
 
             handleOperators(e) {
-                if(!this.state.currentVal.includes('Limit')) {
-                    const value = e.target.value;
-                    const { formula, prevVal, evaluated } = this.state;
+                if(!this.state.currentVal.includes('Limit')) {  //최댓값를 안 넘겼으면
+                    const value = e.target.value;  //현재 값?
+                    const { formula, prevVal, evaluated } = this.state;  //공식, 이전 값, 계산여부?
                     this.setState({ currentVal: value, evaluated: false });
-                    if(evaluated) {
-                        this.setState({ formula: prevVal + value });
-                    } else if(!endsWithOperator.test(formula)) {
+                    if(evaluated) {  //계산된 공식이면
+                        this.setState({ formula: prevVal + value });  //이전 값에 더하기 
+                    } else if(!endsWithOperator.test(formula)) {  //공식이 x, +, -, /로 끝나면
                         this.setState({
+                            //-로 끝나는지 확인해서
+                            //true면 공식은 여전히 공식
+                            //false면 이전 값
+                            //현재 값 더해주고
                             formula:
                                 (endsWithNegativeSign.test(formula + value) ? formula : prevVal) + value
                         });
-                    } 
+                    } else if(value !== '-') {  //현재 값이 -가 아니면
+                        this.setState({
+                            formula: prevVal + value  //공식은 이전 값 + 현재 값
+                        });
+                    }
                 }
+            }
+
+            handleNumbers(e) {
+                if(!this.state.currentVal.includes('Limit')) {  //최댓값을 넘기지 않으면
+                    const { currentVal, formula, evaluated } = this.state;  
+                    const value = e.target.value;
+                    this.setState({ evaluated: false });
+                    if(currentval.length > 21) {  //현재값의 자릿값이 21을 넘기면
+                        this.maxDigitWarning();  //최댓값 넘었어!! 경고!!
+                    } else if(evalutated) {  //계산 후면
+                        this.setState({
+                            currentVal: value,  //현재값에 계산된 값
+                            formula: value !== '0' ? value : ''  //공식은 값이 0이 아니면 현재 값, 0이면 ''
+                        });
+                    } else {
+                        console.log("formula = " + formula);
+                        this.setState({
+                            currentVal:
+                                //현재값이 0이거나 가감승제로 이루어져 있으면
+                                currentVal === '0' || isOperator.test(currentVal)
+                                    ? value //현재값에 지금 입력된 값을 
+                                    : currentVal + value,  //아니면 현재값에 지금 입력된 값을 더하기
+                            formula: 
+                                //현재값이 0이고 지금 입력된 값이 0이면
+                                currentVal === '0' && value === '0'
+                                    ? formula === ''  //공식이 없으면
+                                        ? value  //입력된 값을
+                                        : formula  //있으면 공식을
+                                    : /([^.0-9]0|^0)$/.test(formula)  //.과 0-9이 아니고 0으로 시작하는 것? 
+                                        ? formula.slice(0, -1) + value //제일 뒤에 빼고 입력된 값 더하기
+                                        : formula + value  //공식 + 입력된 값
+                        });
+                        console.log("formula = " + formula);
+                    }
+                }
+            }
+
+            //소수점 다루기?
+            handleDecimal() {
+                if(this.state.evaluated === true) {  //계산된 결과면
+                    this.setState({
+                        currentVal: '0.',
+                        formula: '0.',
+                        evaluated: false
+                    });
+                //현재값이 .을 포함하고 최댓값을 넘기지 않았으면
+                } else if(!this.state.currentVal.includes('.') && !this.state.currentVal.includes('Limit')) {
+                    this.setState({ evaluated: false });  //계산 안될걸로?
+                    if(this.state.currentVal.lenght > 21) {  //현재값의 자릿값이 21을 넘기면
+                        this.maxDigitWarning();  //최댓값 넘었어!! 경고!!
+                    //가감승제로 끝나거나 현재값이 0이면서 공식이 없으면
+                    } else if(endsWithOperator.test(this.state.formula) || (this.state.currentVal === '0' && this.state.formula === '')) {
+                        this.setState({
+                            currentVal: '0.',
+                            formula: this.state.formula + '0.'
+                        });
+                    } else {
+                        this.setState({
+                            //-가 있거나 없거나+숫자+.이 있거나 없거나+숫자반복 이것들로 끝나면
+                            currentVal: this.state.formula.match(/(-?\d+\.?\d*)$/)[0] + '.',
+                            formula: this.state.formula + '.'
+                        });
+                    }
+                }
+            }
+
+            initialize() {
+                this.setState({
+                    currentVal: '0',
+                    prevVal: '0',
+                    formula: '',
+                    currentSign: 'pos',
+                    lastClicked: '',
+                    evaluated: false
+                });
+            }
+
+            render() {
+                return (
+                    <div>
+                        <div class="calculator">
+                            <Formula formula={this.state.formula.replace(/x/g, '⋅')} />
+                            <Output currentVal={this.state.currentVal} />
+                            <Buttons
+                                decimal={this.handleDecimal}
+                                evaluate={this.handleEvaluate}
+                                initialize={this.initialize}
+                                numbers={this.handleNumbers}
+                                operators={this.handleOperators} />
+                        </div>
+                    </div>
+                    <div class="author">
+                        
+                    </div>
+                );
             }
         };
 
