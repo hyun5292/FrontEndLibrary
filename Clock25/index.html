@@ -17,7 +17,57 @@
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
     <script type="text/babel">
-        
+
+
+        class Clock extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    minute: '25',
+                    second: '00',
+                    BLen: '5',
+                    SLen: '25'
+                };
+            }
+
+            render() {
+                return (
+                    <div class="wrap">
+                        <div class="clock">
+                            <div class="logo">25 + 5 Clock</div>
+                            {/*<TimeLenghtControl />
+                            <TimeLenghtControl />*/}
+                            <div class="session">
+                                <div class="timer-wrap">
+                                    <span>Session</span>
+                                    <div class="timer">
+                                        {this.state.minute}:{this.state.second}    
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="player">
+                                <button id="start_stop" onClick={this.timerControl}>
+                                    <i className="fa fa-play fa-2x" />
+                                    <i className="fa fa-pause fa-2x" />
+                                </button>
+                                <button id="reset" onClick={this.reset}>
+                                    <i className="fa fa-refresh fa-2x" />
+                                </button>
+                            </div>
+                        </div>
+                        <div class="author">
+                            {' '}
+                            Designed and Coded by <br />
+                            <a href="#a" target="_blank">
+                                SuDol
+                            </a>
+                        </div>
+                    </div>
+                );
+            };
+        };
+
+        ReactDOM.render(<Clock />, document.getElementById("app"));
     </script>
 </body>
 </html>
