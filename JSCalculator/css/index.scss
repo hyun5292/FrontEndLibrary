@@ -15,4 +15,22 @@
 }
 $button: #4d4d4d;
 
+#app { display: flex; height: 100vh; justify-content: center; align-items: center; }
 
+body { background: #c2c2d6; }
+
+.calculator { position: relative; padding: 5px; width: 320px; border: 2px solid #47476b; background: black; }
+
+.formulaScreen { min-height: 20px; vertical-align: text-top; overflow-wrap: break-word; font-family: digital; font-style: 20px; text-align: right; color: orange; word-wrap: break-word; }
+
+.outputScreen { font-size: 29px; font-family: digital; color: white; text-align: right; line-height: 35px; }
+
+button { position: relative; width: 80px; height: 65px; border: 1px solid black; border: none; font-family: Share Tech Mono, monospace; font-size: 20px; color: white; cursor: default; background: $button; 
+  &:hover { z-index: 3; border: 0.05em solid gray; color: black; }
+}
+
+.jumbo { width: 160px; }
+
+.author { margin-top: 15px; font-family: Share Tech Mono, sans; text-align: center;  
+  a { color: #00264d; line-height: 26px; }
+}
