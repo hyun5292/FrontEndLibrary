@@ -84,7 +84,21 @@
                 }
             }
 
-            
+            handleOperators(e) {
+                if(!this.state.currentVal.includes('Limit')) {
+                    const value = e.target.value;
+                    const { formula, prevVal, evaluated } = this.state;
+                    this.setState({ currentVal: value, evaluated: false });
+                    if(evaluated) {
+                        this.setState({ formula: prevVal + value });
+                    } else if(!endsWithOperator.test(formula)) {
+                        this.setState({
+                            formula:
+                                (endsWithNegativeSign.test(formula + value) ? formula : prevVal) + value
+                        });
+                    } 
+                }
+            }
         };
 
         ReactDOM.render(<Calculator />, document.getElementById("app"));
