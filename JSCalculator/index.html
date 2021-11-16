@@ -44,7 +44,7 @@
                 };
                 this.maxDigitWarning = this.maxDigitWarning.bind(this);
                 this.handleOperators = this.handleOperators.bind(this);
-                this.hadleEvaluate = this.hadleEvaluate.bind(this);
+                this.handleEvaluate = this.handleEvaluate.bind(this);
                 this.initialize = this.initialize.bind(this);
                 this.handleDecimal = this.handleDecimal.bind(this);
                 this.handleNumbers = this.handleNumbers.bind(this);
@@ -53,7 +53,7 @@
             //최댓값이 있는 계산기였구낭
             maxDigitWarning() {
                 this.setState({
-                    currentBal: 'Digit Limit Met',
+                    currentVal: 'Digit Limit Met',
                     prevVal: this.state.currentVal
                 });
                 setTimeout(() => this.setState({ currentVal: this.state.prevVal }), 1000);
@@ -61,50 +61,54 @@
 
             //계산하는 메서드인가
             handleEvaluate() {
-                if(!this.state.currentVal.includes('Limit')) {  //최댓값을 안넘었으면
+                if (!this.state.currentVal.includes('Limit')) {  //최댓값을 안넘었으면
                     let expression = this.state.formula;  //현재 계산 공식
-                    while(endsWithOperator.test(expression)) {  //공식이 x, +, -, /로 끝나는 동안
+                    while (endsWithOperator.test(expression)) {  //공식이 x, +, -, /로 끝나는 동안
                         expression = expression.slice(0, -1);  //끝에서 1개 발췌?
-                        console.log("exrpession = " + exrpession);
                     }
                     expression = expression
                         .replace(/x/g, '*')  //계산은 x가 아니라 *로 하니까
-                        .replace(/-/g, '-')
+                        .replace(/‑/g, '-')
                         .replace('--', '+0+0+0+0+0+0+');  //이건 또 뭘까
                     //계산해서 왜 1000000000000을 곱하고 나누는걸까?
                     let answer = Math.round(1000000000000 * eval(expression)) / 1000000000000;
                     this.setState({
                         currentVal: answer.toString(),
                         formula:
-                            expression
-                                .replace(/\*/g, '⋅')
-                                .replace(/-/g, '-')
-                                .replace('+0+0+0+0+0+0+', '--')
-                                .replace(/(x|\/|\+)-/, '$1-')
-                                .replace(/^-/, '-') + '=' + answer,
-                            prevVal: answer,
-                            evaluated: true
+                        expression
+                            .replace(/\*/g, '⋅')
+                            .replace(/-/g, '‑')
+                            .replace('+0+0+0+0+0+0+', '‑-')
+                            .replace(/(x|\/|\+)‑/, '$1-')
+                            .replace(/^‑/, '-') + '=' + answer,
+                        prevVal: answer,
+                        evaluated: true
                     });
                 }
             }
 
             handleOperators(e) {
-                if(!this.state.currentVal.includes('Limit')) {  //최댓값를 안 넘겼으면
+                if (!this.state.currentVal.includes('Limit')) {  //최댓값를 안 넘겼으면
                     const value = e.target.value;  //현재 값?
                     const { formula, prevVal, evaluated } = this.state;  //공식, 이전 값, 계산여부?
                     this.setState({ currentVal: value, evaluated: false });
-                    if(evaluated) {  //계산된 공식이면
+                    if (evaluated) {  //계산된 공식이면
                         this.setState({ formula: prevVal + value });  //이전 값에 더하기 
-                    } else if(!endsWithOperator.test(formula)) {  //공식이 x, +, -, /로 끝나면
+                    } else if (!endsWithOperator.test(formula)) {  //공식이 x, +, -, /로 끝나면
                         this.setState({
-                            //-로 끝나는지 확인해서
+                            prevVal: formula,
+                            formula: formula + value
+                        });
+                    } else if (!endsWithNegativeSign.test(formula)) {  //공식이 -로 끝나지 않으면?
+                        this.setState({
+                            //공식+값이 -로 끝나는지 확인해서
                             //true면 공식은 여전히 공식
                             //false면 이전 값
                             //현재 값 더해주고
                             formula:
                                 (endsWithNegativeSign.test(formula + value) ? formula : prevVal) + value
                         });
-                    } else if(value !== '-') {  //현재 값이 -가 아니면
+                    } else if (value !== '‑') {  //현재 값이 -가 아니면
                         this.setState({
                             formula: prevVal + value  //공식은 이전 값 + 현재 값
                         });
@@ -113,55 +117,53 @@
             }
 
             handleNumbers(e) {
-                if(!this.state.currentVal.includes('Limit')) {  //최댓값을 넘기지 않으면
-                    const { currentVal, formula, evaluated } = this.state;  
+                if (!this.state.currentVal.includes('Limit')) {  //최댓값을 넘기지 않으면
+                    const { currentVal, formula, evaluated } = this.state;
                     const value = e.target.value;
                     this.setState({ evaluated: false });
-                    if(currentval.length > 21) {  //현재값의 자릿값이 21을 넘기면
+                    if (currentVal.length > 21) {  //현재값의 자릿값이 21을 넘기면
                         this.maxDigitWarning();  //최댓값 넘었어!! 경고!!
-                    } else if(evalutated) {  //계산 후면
+                    } else if (evaluated) {  //계산 후면
                         this.setState({
                             currentVal: value,  //현재값에 계산된 값
                             formula: value !== '0' ? value : ''  //공식은 값이 0이 아니면 현재 값, 0이면 ''
                         });
                     } else {
-                        console.log("formula = " + formula);
                         this.setState({
                             currentVal:
                                 //현재값이 0이거나 가감승제로 이루어져 있으면
                                 currentVal === '0' || isOperator.test(currentVal)
-                                    ? value //현재값에 지금 입력된 값을 
+                                    ? value  //현재값에 지금 입력된 값을 
                                     : currentVal + value,  //아니면 현재값에 지금 입력된 값을 더하기
-                            formula: 
+                            formula:
                                 //현재값이 0이고 지금 입력된 값이 0이면
                                 currentVal === '0' && value === '0'
                                     ? formula === ''  //공식이 없으면
                                         ? value  //입력된 값을
                                         : formula  //있으면 공식을
                                     : /([^.0-9]0|^0)$/.test(formula)  //.과 0-9이 아니고 0으로 시작하는 것? 
-                                        ? formula.slice(0, -1) + value //제일 뒤에 빼고 입력된 값 더하기
+                                        ? formula.slice(0, -1) + value  //제일 뒤에 빼고 입력된 값 더하기
                                         : formula + value  //공식 + 입력된 값
                         });
-                        console.log("formula = " + formula);
                     }
                 }
             }
 
             //소수점 다루기?
             handleDecimal() {
-                if(this.state.evaluated === true) {  //계산된 결과면
+                if (this.state.evaluated === true) {  //계산된 결과면
                     this.setState({
                         currentVal: '0.',
                         formula: '0.',
                         evaluated: false
                     });
                 //현재값이 .을 포함하고 최댓값을 넘기지 않았으면
-                } else if(!this.state.currentVal.includes('.') && !this.state.currentVal.includes('Limit')) {
+                } else if (!this.state.currentVal.includes('.') && !this.state.currentVal.includes('Limit')) {
                     this.setState({ evaluated: false });  //계산 안될걸로?
-                    if(this.state.currentVal.lenght > 21) {  //현재값의 자릿값이 21을 넘기면
+                    if (this.state.currentVal.length > 21) {  //현재값의 자릿값이 21을 넘기면
                         this.maxDigitWarning();  //최댓값 넘었어!! 경고!!
                     //가감승제로 끝나거나 현재값이 0이면서 공식이 없으면
-                    } else if(endsWithOperator.test(this.state.formula) || (this.state.currentVal === '0' && this.state.formula === '')) {
+                    } else if (endsWithOperator.test(this.state.formula) || (this.state.currentVal === '0' && this.state.formula === '')) {
                         this.setState({
                             currentVal: '0.',
                             formula: this.state.formula + '0.'
@@ -189,22 +191,131 @@
 
             render() {
                 return (
-                    <div>
-                        <div class="calculator">
-                            <Formula formula={this.state.formula.replace(/x/g, '⋅')} />
-                            <Output currentVal={this.state.currentVal} />
-                            <Buttons
-                                decimal={this.handleDecimal}
-                                evaluate={this.handleEvaluate}
-                                initialize={this.initialize}
-                                numbers={this.handleNumbers}
-                                operators={this.handleOperators} />
-                        </div>
+                <div>
+                    <div className="calculator">
+                    <Formula formula={this.state.formula.replace(/x/g, '⋅')} />
+                    <Output currentValue={this.state.currentVal} />
+                    <Buttons
+                        decimal={this.handleDecimal}
+                        evaluate={this.handleEvaluate}
+                        initialize={this.initialize}
+                        numbers={this.handleNumbers}
+                        operators={this.handleOperators} />
                     </div>
-                    <div class="author">
-                        
+                    <div className="author">
+                        {' '}
+                        Designed and Coded By <br />
+                        <a href="#a" target="_blank">
+                            SuDol
+                        </a>
+                    </div>
+                </div>
+                );
+            }
+        };
+
+        class Buttons extends React.Component {
+            render() {
+                return (
+                    <div>
+                        <button
+                            className="jumbo"
+                            id="clear"
+                            onClick={this.props.initialize}
+                            style={clearStyle}
+                            value="AC" >
+                            AC
+                        </button>
+                        <button
+                            id="divide"
+                            onClick={this.props.operators}
+                            style={operatorStyle}
+                            value="/" >
+                            /
+                        </button>
+                        <button
+                            id="multiply"
+                            onClick={this.props.operators}
+                            style={operatorStyle}
+                            value="x" >
+                            x
+                        </button>
+                        <button id="seven" onClick={this.props.numbers} value="7">
+                            7
+                        </button>
+                        <button id="eight" onClick={this.props.numbers} value="8">
+                            8
+                        </button>
+                        <button id="nine" onClick={this.props.numbers} value="9">
+                            9
+                        </button>
+                        <button
+                            id="subtract"
+                            onClick={this.props.operators}
+                            style={operatorStyle}
+                            value="‑" >
+                            ‑
+                        </button>
+                        <button id="four" onClick={this.props.numbers} value="4">
+                            4
+                        </button>
+                        <button id="five" onClick={this.props.numbers} value="5">
+                            5
+                        </button>
+                        <button id="six" onClick={this.props.numbers} value="6">
+                            6
+                        </button>
+                        <button
+                            id="add"
+                            onClick={this.props.operators}
+                            style={operatorStyle}
+                            value="+" >
+                            +
+                        </button>
+                        <button id="one" onClick={this.props.numbers} value="1">
+                            1
+                        </button>
+                        <button id="two" onClick={this.props.numbers} value="2">
+                            2
+                        </button>
+                        <button id="three" onClick={this.props.numbers} value="3">
+                            3
+                        </button>
+                        <button
+                            className="jumbo"
+                            id="zero"
+                            onClick={this.props.numbers}
+                            value="0" >
+                            0
+                        </button>
+                        <button id="decimal" onClick={this.props.decimal} value=".">
+                            .
+                        </button>
+                        <button
+                            id="equals"
+                            onClick={this.props.evaluate}
+                            style={equalsStyle}
+                            value="=">
+                            =
+                        </button>
                     </div>
                 );
+            }
+        };
+
+        class Output extends React.Component {
+            render() {
+                return (
+                <div className="outputScreen" id="display">
+                    {this.props.currentValue}
+                </div>
+                );
+            }
+        };
+
+        class Formula extends React.Component {
+            render() {
+                return <div className="formulaScreen">{this.props.formula}</div>;
             }
         };
 
