@@ -1,1 +1,97 @@
-/* No CSS */
+body {
+  background: #1e555c;
+}
+
+body #app {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 100vh;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+div {
+  display: block;
+}
+
+.clock {
+  text-align: center;
+  color: white;
+}
+
+.logo {
+  display: block;
+  font-size: 50px;
+  margin-bottom: 20px;
+}
+
+.ctrlLen {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.ctrlLen .BLen, .ctrlLen .SLen {
+  display: inline-block;
+  margin: 50px;
+  width: 250px;
+}
+
+.session {
+  position: relative;
+  display: block;
+  margin: 20px auto 10px auto;
+  width: 270px;
+  height: 160px;
+  text-align: center;
+  border: 7px solid #13353a;
+  border-radius: 50px;
+  font-size: 30px;
+}
+
+.session .timer-wrap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -95px;
+  margin-top: -57px;
+}
+
+.session .timer-wrap .timer {
+  margin: 0px;
+  padding: 0px;
+  bottom: 0px;
+  font-size: 80px;
+}
+
+.player {
+  font-size: 30px;
+}
+
+.player button {
+  margin: 15px 9px;
+  border: none;
+  outline: none;
+  background: none;
+}
+
+.player button i {
+  color: white;
+}
+
+.author {
+  font-family: Share Tech Mono, sans;
+  font-size: 14px;
+  text-align: center;
+  color: #a50d0d;
+}
+
+.author a {
+  line-height: 26px;
+  color: #00264d;
+}
