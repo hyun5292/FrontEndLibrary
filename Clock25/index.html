@@ -11,63 +11,176 @@
     <title>25+5 Clock</title>
 </head>
 <body>
-    <div id="app"></div>
+    <div class="container">
+        <div class="app"></div>
+    </div>
 
     <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
     <script type="text/babel">
+        const projectName = '25-5-clock';
 
-
-        class Clock extends React.Component {
+        class Timer extends React.Component {
             constructor(props) {
                 super(props);
                 this.state = {
-                    minute: '25',
-                    second: '00',
-                    BLen: '5',
-                    SLen: '25'
+                    brkLength: 5,
+                    seshLength: 25,
+                    timerState: 'stopped',
+                    timerType: 'Session',
+                    timer: 1500,
+                    intervalID: '',
+                    alarmColor: { color: 'white' }
                 };
+                this.setBrkLength = this.setBrkLength.bind(this);
+                this.setSeshLength = this.setSeshLength.bind(this);
+                this.lengthControl = this.lengthControl.bind(this);
+                this.timerControl = this.timerControl.bind(this);
+                this.beginCountDown = this.beginCountDown.bind(this);
+                this.decrementTimer = this.decrementTimer.bind(this);
+                this.phaseControl = this.phaseControl.bind(this);
+                this.warning = this.warning.bind(this);
+                this.buzzer = this.buzzer.bind(this);
+                this.switchTimer = this.switchTimer.bind(this);
+                this.clockify = this.clockify.bind(this);
+            }
+            setBrkLength(e) {
+                this.lengthControl(
+                    'brkLength',
+                    e.currentTarget.value,
+                    this.state.brkLength,
+                    'Session'
+                );
             }
 
-            render() {
-                return (
-                    <div class="wrap">
-                        <div class="clock">
-                            <div class="logo">25 + 5 Clock</div>
-                            {/*<TimeLenghtControl />
-                            <TimeLenghtControl />*/}
-                            <div class="session">
-                                <div class="timer-wrap">
-                                    <span>Session</span>
-                                    <div class="timer">
-                                        {this.state.minute}:{this.state.second}    
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="player">
-                                <button id="start_stop" onClick={this.timerControl}>
-                                    <i className="fa fa-play fa-2x" />
-                                    <i className="fa fa-pause fa-2x" />
-                                </button>
-                                <button id="reset" onClick={this.reset}>
-                                    <i className="fa fa-refresh fa-2x" />
-                                </button>
-                            </div>
-                        </div>
-                        <div class="author">
-                            {' '}
-                            Designed and Coded by <br />
-                            <a href="#a" target="_blank">
-                                SuDol
-                            </a>
-                        </div>
-                    </div>
+            setSeshLength(e) {
+                this.lengthControl(
+                    'seshLength',
+                    e.currentTarget.value,
+                    this.state.seshLength,
+                    'Break'
                 );
-            };
-        };
+            }
 
-        ReactDOM.render(<Clock />, document.getElementById("app"));
+            lengthControl(stateToChange, sign, currentLength, timerType) {
+                if(this.state.timerState === 'running') {
+                    return;
+                };
+                if(this.state.timerType === timerType) {
+                    if(sign === '-' && currentLength !== 1) {
+                        this.setState({
+                            [stateToChange]: currentLength - 1
+                        });
+                    } else if(sign === '+' && currentLength !== 60) {
+                        this.setState({
+                            [stateToChange]: currentLength + 1
+                        });
+                    }
+                } else if(sign === '-' && currentLength !== 1) {
+                    this.setState({
+                        [stateToChange]: currentLength - 1,
+                        timer: currentLength * 60 - 60
+                    });
+                } else if(sign === '+' && currentLength !== 60) {
+                    this.setState({
+                        [stateToChange]: currentLength + 1,
+                        timer: currentLength * 60 + 60
+                    });
+                }
+            }
+
+            timerControl() {
+                if(this.state.timerState === 'stopped') {
+                    this.beginCountDown();
+                    this.setState({
+                        timerState: 'running'
+                    });
+                    if(this.state.intervalID) {
+                        this.state.intervalID.cancel();
+                    }
+                }
+            }
+
+            beginCountDown() {
+                this.setState({
+                    intervalID: accurateInterval(() => {
+                        this.decrementTimer();
+                        this.phaseControl();
+                    }, 1000)
+                });
+            }
+
+            decrementTimer() {
+                this.setState({
+                    timer: this.state.timer - 1
+                });
+            }
+
+            phaseControl() {
+                let timer = this.state.timer;
+                this.warning(timer);
+                this.buzzer(timer);
+                if(timer < 0) {
+                    if(this.state.intervalID) {
+                        this.state.intervalID.cancel();
+                    }
+                    if(this.state.timerType === 'Session') {
+                        this.beginCountDown();
+                        this.switchTimer(this.state.brkLength * 60, 'Break');
+                    } else {
+                        this.beginCountDown();
+                        this.switchTimer(this.state.seshLength * 60, 'Session');
+                    }
+                }
+            }
+
+            warning(_timer) {
+                if(_timer < 61) {
+                    this.setState({
+                        alarmColor: { color: '#a50d0d' }
+                    });
+                } else {
+                    this.setState({
+                        alarmColor: { color: 'white' }
+                    });
+                }
+            }
+
+            buzzer(_timer) {
+                if(_timer === 0) {
+                    this.audioBeep.play();
+                }
+            }
+
+            switchTimer(num, str) {
+                this.setState({
+                    timer: num,
+                    timerType: str,
+                    alarmColor: { color: 'white' }
+                });
+            }
+
+            clockify() {
+                let minutes = Math.floor(this.state.timer / 60);
+                let seconds = this.state.timer - minutes * 60;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                return minutes + ':' + seconds;
+            }
+
+            reset() {
+                this.setState({
+                    brkLength: 5,
+                    seshLength: 25,
+                    timerState: 'stopped',
+                    timerType: 'Session',
+                    timer: 1500,
+                    intervalID: '',
+                    alarmColor: { color: 'white' }
+                });
+            }
+        };
     </script>
 </body>
 </html>
