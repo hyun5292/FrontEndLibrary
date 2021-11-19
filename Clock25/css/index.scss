@@ -1,4 +1,5 @@
 body { font-size: 30px; text-align: center; color: white; background: #1e555c;
+    /* 가운데 배치 공식 */
     #container { display: flex; height: 100vh; justify-content: center; align-items: center;
         .main-title { margin-bottom: 20px; font-size: 50px; }
         .length-control { width: 250px; }
@@ -18,6 +19,7 @@ body { font-size: 30px; text-align: center; color: white; background: #1e555c;
     a { line-height: 26px; color: #00264d; }
 }
 
+//화면 넓이가 500이하면
 @media screen and (max-width: 500px) {
     #container {
       transform: scale(0.8);
