@@ -19,255 +19,288 @@
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
     <script type="text/babel">
+        /*
+        이 타이머의 비밀을 알았다...
+        Session Length만큼 타이머가 재생되고 
+        그 뒤에 Break Length만큼 타이머가 재생된다...
+        재생 정지 리셋은 언제나 가능
+        그리고 Session하고 Break 무한반복이구낭
+        */
         const projectName = '25-5-clock';
 
         const accurateInterval = function (fn, time) {
-        var cancel, nextAt, timeout, wrapper;
-        nextAt = new Date().getTime() + time;
-        timeout = null;
-        wrapper = function () {
-            nextAt += time;
+            var cancel, nextAt, timeout, wrapper;
+            nextAt = new Date().getTime() + time;
+            timeout = null;
+            wrapper = function () {
+                nextAt += time;
+                timeout = setTimeout(wrapper, nextAt - new Date().getTime());
+                return fn();
+            };
+            cancel = function () {
+                return clearTimeout(timeout);
+            };
             timeout = setTimeout(wrapper, nextAt - new Date().getTime());
-            return fn();
-        };
-        cancel = function () {
-            return clearTimeout(timeout);
-        };
-        timeout = setTimeout(wrapper, nextAt - new Date().getTime());
-        return {
-            cancel: cancel
-        };
+            return {
+                cancel: cancel
+            };
         };
 
         // COMPONENTS:
         class TimerLengthControl extends React.Component {
-        render() {
-            return (
-            <div className="length-control">
-                <div id={this.props.titleID}>{this.props.title}</div>
-                <button
-                className="btn-level"
-                id={this.props.minID}
-                onClick={this.props.onClick}
-                value="-"
-                >
-                <i className="fa fa-arrow-down fa-2x" />
-                </button>
-                <div className="btn-level" id={this.props.lengthID}>
-                {this.props.length}
-                </div>
-                <button
-                className="btn-level"
-                id={this.props.addID}
-                onClick={this.props.onClick}
-                value="+"
-                >
-                <i className="fa fa-arrow-up fa-2x" />
-                </button>
-            </div>
-            );
-        }
+            render() {
+                return (
+                    <div className="length-control">
+                        <div id={this.props.titleID}>{this.props.title}</div>
+                        <button
+                            className="btn-level"
+                            id={this.props.minID}
+                            onClick={this.props.onClick}
+                            value="-" >
+                            <i className="fa fa-arrow-down fa-2x" />
+                        </button>
+                        <div className="btn-level" id={this.props.lengthID}>
+                            {this.props.length}
+                        </div>
+                        <button
+                            className="btn-level"
+                            id={this.props.addID}
+                            onClick={this.props.onClick}
+                            value="+" >
+                            <i className="fa fa-arrow-up fa-2x" />
+                        </button>
+                    </div>
+                );
+            }
         }
 
         class Timer extends React.Component {
-        constructor(props) {
-            super(props);
-            this.state = {
-            brkLength: 5,
-            seshLength: 25,
-            timerState: 'stopped',
-            timerType: 'Session',
-            timer: 1500,
-            intervalID: '',
-            alarmColor: { color: 'white' }
-            };
-            this.setBrkLength = this.setBrkLength.bind(this);
-            this.setSeshLength = this.setSeshLength.bind(this);
-            this.lengthControl = this.lengthControl.bind(this);
-            this.timerControl = this.timerControl.bind(this);
-            this.beginCountDown = this.beginCountDown.bind(this);
-            this.decrementTimer = this.decrementTimer.bind(this);
-            this.phaseControl = this.phaseControl.bind(this);
-            this.warning = this.warning.bind(this);
-            this.buzzer = this.buzzer.bind(this);
-            this.switchTimer = this.switchTimer.bind(this);
-            this.clockify = this.clockify.bind(this);
-            this.reset = this.reset.bind(this);
-        }
-        setBrkLength(e) {
-            this.lengthControl(
-            'brkLength',
-            e.currentTarget.value,
-            this.state.brkLength,
-            'Session'
-            );
-        }
-        setSeshLength(e) {
-            this.lengthControl(
-            'seshLength',
-            e.currentTarget.value,
-            this.state.seshLength,
-            'Break'
-            );
-        }
-        lengthControl(stateToChange, sign, currentLength, timerType) {
-            if (this.state.timerState === 'running') {
-            return;
+            constructor(props) {
+                super(props);
+                this.state = {
+                    brkLength: 5,
+                    seshLength: 25,
+                    timerState: 'stopped',
+                    timerType: 'Session',
+                    timer: 1500,
+                    intervalID: '',
+                    alarmColor: { color: 'white' }
+                };
+                this.setBrkLength = this.setBrkLength.bind(this);
+                this.setSeshLength = this.setSeshLength.bind(this);
+                this.lengthControl = this.lengthControl.bind(this);
+                this.timerControl = this.timerControl.bind(this);
+                this.beginCountDown = this.beginCountDown.bind(this);
+                this.decrementTimer = this.decrementTimer.bind(this);
+                this.phaseControl = this.phaseControl.bind(this);
+                this.warning = this.warning.bind(this);
+                this.buzzer = this.buzzer.bind(this);
+                this.switchTimer = this.switchTimer.bind(this);
+                this.clockify = this.clockify.bind(this);
+                this.reset = this.reset.bind(this);
             }
-            if (this.state.timerType === timerType) {
-            if (sign === '-' && currentLength !== 1) {
-                this.setState({ [stateToChange]: currentLength - 1 });
-            } else if (sign === '+' && currentLength !== 60) {
-                this.setState({ [stateToChange]: currentLength + 1 });
+            //Break Length 설정
+            setBrkLength(e) {
+                this.lengthControl(
+                    'brkLength',
+                    e.currentTarget.value,
+                    this.state.brkLength,
+                    'Session'
+                );
             }
-            } else if (sign === '-' && currentLength !== 1) {
-            this.setState({
-                [stateToChange]: currentLength - 1,
-                timer: currentLength * 60 - 60
-            });
-            } else if (sign === '+' && currentLength !== 60) {
-            this.setState({
-                [stateToChange]: currentLength + 1,
-                timer: currentLength * 60 + 60
-            });
+            //Session Length 설정
+            setSeshLength(e) {
+                this.lengthControl(
+                    'seshLength',
+                    e.currentTarget.value,
+                    this.state.seshLength,
+                    'Break'
+                );
             }
-        }
-        timerControl() {
-            if (this.state.timerState === 'stopped') {
-            this.beginCountDown();
-            this.setState({ timerState: 'running' });
-            } else {
-            this.setState({ timerState: 'stopped' });
-            if (this.state.intervalID) {
-                this.state.intervalID.cancel();
+            //stateToChange = 'brkLength' 또는 'seshLength'
+            //sign = Length 화살표가 -인지 +인지
+            //currentLength = brk 또는 Sesh 길이 
+            //timerType = 'Session' 또는 'Break' 현재랑 반대
+            //Length 화살표를 건드렸을 경우
+            lengthControl(stateToChange, sign, currentLength, timerType) {
+                if (this.state.timerState === 'running') {  //현재 재생중
+                    return;
+                }
+                //현재 상태랑 매개변수 timerType이랑 같을 경우
+                if (this.state.timerType === timerType) {
+                    //값을 내렸는데 1(최솟값)이 아니면
+                    if (sign === '-' && currentLength !== 1) {
+                        //brkLength나 seshLength 값을 1 내리기
+                        this.setState({ [stateToChange]: currentLength - 1 });
+                    }
+                    //값을 올렸는데 60(최댓값)이 아니면
+                    else if (sign === '+' && currentLength !== 60) {
+                        //brkLength나 seshLength 값을 1 올리기
+                        this.setState({ [stateToChange]: currentLength + 1 });
+                    }
+                }
+                    //timerType이 달라졌고 값을 내렸는데 1(최솟값)이 아니면
+                    else if (sign === '-' && currentLength !== 1) {
+                    this.setState({
+                        //brkLength나 seshLength 값을 1 내리기
+                        [stateToChange]: currentLength - 1,
+                        timer: currentLength * 60 - 60  //시간을 초단위로 계산
+                    });
+                }
+                    //timerType이 달라졌고 값을 올렸는데 60(최댓값)이 아니면
+                    else if (sign === '+' && currentLength !== 60) {
+                    this.setState({
+                        //brkLength나 seshLength 값을 1 올리기
+                        [stateToChange]: currentLength + 1,
+                        timer: currentLength * 60 + 60  //시간을 초단위로 계산
+                    });
+                }
             }
+            //시간 Play, Pause 작동
+            timerControl() {
+                if (this.state.timerState === 'stopped') {  //현재 상태가 정지!!면
+                    this.beginCountDown();  //카운팅 시작!!
+                    this.setState({ timerState: 'running' });  //시작으로 바꿔주기
+                } else {  //현재 상태가 시작!!이면
+                    this.setState({ timerState: 'stopped' });  //정지로 바꿔주기
+                    //console로 찍어내니까 {cancel: f}로 나오네...?
+                    if (this.state.intervalID) { 
+                        this.state.intervalID.cancel();
+                    }
+                }
             }
-        }
-        beginCountDown() {
-            this.setState({
-            intervalID: accurateInterval(() => {
-                this.decrementTimer();
-                this.phaseControl();
-            }, 1000)
-            });
-        }
-        decrementTimer() {
-            this.setState({ timer: this.state.timer - 1 });
-        }
-        phaseControl() {
-            let timer = this.state.timer;
-            this.warning(timer);
-            this.buzzer(timer);
-            if (timer < 0) {
-            if (this.state.intervalID) {
-                this.state.intervalID.cancel();
+            //카운팅 시작!!
+            beginCountDown() {
+                this.setState({
+                    intervalID: accurateInterval(() => {
+                        this.decrementTimer();  //초단위로 계산된 시간 1초씩 줄이기
+                        this.phaseControl();
+                    }, 1000)
+                });
             }
-            if (this.state.timerType === 'Session') {
-                this.beginCountDown();
-                this.switchTimer(this.state.brkLength * 60, 'Break');
-            } else {
-                this.beginCountDown();
-                this.switchTimer(this.state.seshLength * 60, 'Session');
+            //초단위로 계산된 시간 1초씩 줄이기
+            decrementTimer() {
+                this.setState({ timer: this.state.timer - 1 });
             }
+            phaseControl() {
+                let timer = this.state.timer;
+                this.warning(timer);  //1분 미만 빨간색으로
+                this.buzzer(timer);  //오디오 재생!!
+                //시간이 끝나면
+                if (timer < 0) {
+                    if (this.state.intervalID) {
+                        this.state.intervalID.cancel();
+                    }
+                    if (this.state.timerType === 'Session') {  //Session이면
+                        this.beginCountDown();  //카운팅 시작!!
+                        this.switchTimer(this.state.brkLength * 60, 'Break');  //끝나면 Break로 바꾸기
+                    } else {  //Break면
+                        this.beginCountDown(); //카운팅 시작!!
+                        this.switchTimer(this.state.seshLength * 60, 'Session');  //끝나면 Session으로 바꾸기
+                    }
+                }
             }
-        }
-        warning(_timer) {
-            if (_timer < 61) {
-            this.setState({ alarmColor: { color: '#a50d0d' } });
-            } else {
-            this.setState({ alarmColor: { color: 'white' } });
+            //1분 미만 빨간색으로
+            warning(_timer) {
+                if (_timer < 61) {  //1분 이하
+                    this.setState({ alarmColor: { color: '#a50d0d' } });  //빨간색
+                } else {
+                    this.setState({ alarmColor: { color: 'white' } });  //그 외에 하얀색
+                }
+            } 
+            //오디오 재생!!
+            buzzer(_timer) {
+                if (_timer === 0) {  //남은 시간이 0초면
+                    this.audioBeep.play();  //삐!! 삐!!
+                }
             }
-        }
-        buzzer(_timer) {
-            if (_timer === 0) {
-            this.audioBeep.play();
+            //시계 종류 바꾸기
+            switchTimer(num, str) {
+                this.setState({
+                    timer: num,
+                    timerType: str,
+                    alarmColor: { color: 'white' }
+                });
             }
-        }
-        switchTimer(num, str) {
-            this.setState({
-            timer: num,
-            timerType: str,
-            alarmColor: { color: 'white' }
-            });
-        }
-        clockify() {
-            let minutes = Math.floor(this.state.timer / 60);
-            let seconds = this.state.timer - minutes * 60;
-            seconds = seconds < 10 ? '0' + seconds : seconds;
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            return minutes + ':' + seconds;
-        }
-        reset() {
-            this.setState({
-            brkLength: 5,
-            seshLength: 25,
-            timerState: 'stopped',
-            timerType: 'Session',
-            timer: 1500,
-            intervalID: '',
-            alarmColor: { color: 'white' }
-            });
-            if (this.state.intervalID) {
-            this.state.intervalID.cancel();
+            //'분:초'로 바꾸기
+            clockify() {
+                let minutes = Math.floor(this.state.timer / 60);  //60으로 나눠서 분 구하기
+                let seconds = this.state.timer - minutes * 60;  //남은 초
+                seconds = seconds < 10 ? '0' + seconds : seconds;  //10초 미만이면 앞에 0 붙이기
+                minutes = minutes < 10 ? '0' + minutes : minutes;  //10분 미만이면 앞에 0 붙이기
+                return minutes + ':' + seconds;
             }
-            this.audioBeep.pause();
-            this.audioBeep.currentTime = 0;
-        }
-        render() {
-            return (
-            <div>
-                <div className="main-title">25 + 5 Clock</div>
-                <TimerLengthControl
-                addID="break-increment"
-                length={this.state.brkLength}
-                lengthID="break-length"
-                minID="break-decrement"
-                onClick={this.setBrkLength}
-                title="Break Length"
-                titleID="break-label"
-                />
-                <TimerLengthControl
-                addID="session-increment"
-                length={this.state.seshLength}
-                lengthID="session-length"
-                minID="session-decrement"
-                onClick={this.setSeshLength}
-                title="Session Length"
-                titleID="session-label"
-                />
-                <div className="timer" style={this.state.alarmColor}>
-                <div className="timer-wrapper">
-                    <div id="timer-label">{this.state.timerType}</div>
-                    <div id="time-left">{this.clockify()}</div>
+            //초기화!!
+            reset() {
+                this.setState({
+                    brkLength: 5,
+                    seshLength: 25,
+                    timerState: 'stopped',
+                    timerType: 'Session',
+                    timer: 1500,
+                    intervalID: '',
+                    alarmColor: { color: 'white' }
+                });
+                if (this.state.intervalID) {
+                    this.state.intervalID.cancel();
+                }
+                this.audioBeep.pause();
+                this.audioBeep.currentTime = 0;
+            }
+            render() {
+                return (
+                <div>
+                    <div className="main-title">25 + 5 Clock</div>
+                    {/*Break-Length*/}
+                    <TimerLengthControl
+                        addID="break-increment"
+                        length={this.state.brkLength}
+                        lengthID="break-length"
+                        minID="break-decrement"
+                        onClick={this.setBrkLength}
+                        title="Break Length"
+                        titleID="break-label" />
+                    {/*Session-Length*/}
+                    <TimerLengthControl
+                        addID="session-increment"
+                        length={this.state.seshLength}
+                        lengthID="session-length"
+                        minID="session-decrement"
+                        onClick={this.setSeshLength}
+                        title="Session Length"
+                        titleID="session-label" />
+                    <div className="timer" style={this.state.alarmColor}>
+                    <div className="timer-wrapper">
+                        <div id="timer-label">{this.state.timerType}</div>
+                        <div id="time-left">{this.clockify()}</div>
+                    </div>
+                    </div>
+                    <div className="timer-control">
+                    <button id="start_stop" onClick={this.timerControl}>
+                        <i className="fa fa-play fa-2x" />
+                        <i className="fa fa-pause fa-2x" />
+                    </button>
+                    <button id="reset" onClick={this.reset}>
+                        <i className="fa fa-refresh fa-2x" />
+                    </button>
+                    </div>
+                    <div className="author">
+                        {' '}
+                        Designed and Coded by <br />
+                        <a href="https://goo.gl/6NNLMG" target="_blank">
+                            SuDol
+                        </a>
+                    </div>
+                    <audio
+                        id="beep"
+                        preload="auto"
+                        ref={(audio) => {
+                            this.audioBeep = audio;
+                        }}
+                        src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav" />
                 </div>
-                </div>
-                <div className="timer-control">
-                <button id="start_stop" onClick={this.timerControl}>
-                    <i className="fa fa-play fa-2x" />
-                    <i className="fa fa-pause fa-2x" />
-                </button>
-                <button id="reset" onClick={this.reset}>
-                    <i className="fa fa-refresh fa-2x" />
-                </button>
-                </div>
-                <div className="author">
-                {' '}
-                Designed and Coded by <br />
-                <a href="https://goo.gl/6NNLMG" target="_blank">
-                    Peter Weinberg
-                </a>
-                </div>
-                <audio
-                id="beep"
-                preload="auto"
-                ref={(audio) => {
-                    this.audioBeep = audio;
-                }}
-                src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
-                />
-            </div>
-            );
-        }
+                );
+            }
         }
 
         ReactDOM.render(<Timer />, document.getElementById('app'));
