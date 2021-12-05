@@ -1,8 +1,7 @@
 # Bootstrap, jQuery, SASS, React, Redux 공부하면서 만든 프로젝트들
 -------------
 + Random Quote Machine
-    : Next 버튼을 누르면 랜덤으로 명언이 나오는 기능
-    
+    : Next 버튼을 누르면 랜덤으로 명언이 나오는 기능<br>
     : AJAX 써서 신기함, 색상은 배열로 난수처리
     - https://github.com/hyun5292/FrontEndLibrary/tree/main/RandomQuote
     
