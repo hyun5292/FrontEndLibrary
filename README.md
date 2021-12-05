@@ -2,6 +2,7 @@
 -------------
 + Random Quote Machine
     : Next 버튼을 누르면 랜덤으로 명언이 나오는 기능
+    
     : AJAX 써서 신기함, 색상은 배열로 난수처리
     - https://github.com/hyun5292/FrontEndLibrary/tree/main/RandomQuote
     
